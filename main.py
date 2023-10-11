@@ -1,16 +1,19 @@
-from flask import Flask, flash, redirect, render_template, request, url_for
-import time
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
-app.secret_key = 'secret_key'
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        flash('Button was clicked!')
-        time.sleep(1)  # Задержка в 1 секунду
-        return redirect(url_for('index'))
+        return '''
+        <script>
+            setTimeout(function() {
+                alert('Button was clicked!');
+            }, 1000);
+            window.location.href = '/';
+        </script>
+        '''
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
