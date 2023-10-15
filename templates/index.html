@@ -1,21 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Button Click</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Загрузить файл</title>
 </head>
 <body>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul class="flashes">
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
+    <div id="progress-container" class="flash"></div>
 
-    <form method="POST" action="{{ url_for('index') }}">
-        <button type="submit">Click me</button>
-    </form> 
-</body>
-</html>
+    {% for flash_type, message in get_flashed_messages(with_categories=True) %}
+        {% if flash_type == 'progress' %}
+            <div class="flash progress">
+                <div class="progress-section">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar"></div>
+                    </div>
+                    <div class="progress-message">{{ message }}</div>
+                </div>
+            </div>
+        {% else %}
+            <div class="flash flash-message">{{ message }}</div>
+        {% endif %}
+    {% endfor %}
+
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".txt">
+       <input type="submit" value="Загрузить">
+    </form>
+
+  <script>
+    {% if progress %}
+        var progressContainer = document.getElementById('progress-container');
+        var progressBar = progressContainer.querySelector('.progress-bar');
+        var progressMessage = progressContainer.querySelector('.progress-message');
+        progressContainer.style.display = 'block';
+        progressBar.style.width = '{{ progress }}%';
+        progressMessage.textContent = 'Файл загружен';
+    {% endif %}
+
+    var flashMessages = document.querySelectorAll('.flash');
+    flashMessages.forEach(function(flashMessage) {
+        if (flashMessage.classList.contains('progress')) {
+            var progressContainer = flashMessage.querySelector('.progress-bar-container');
+            var progressBar = progressContainer.querySelector('.progress-bar');
+            var progressMessage = flashMessage.querySelector('.progress-message');
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressMessage.textContent = '';
+        }
+        flashMessage.style.display = 'block';
+        flashMessage.addEventListener('animationend', function() {
+            flashMessage.remove();
+        }, { once: true });
+    });
+  </script>
+  </body>
+  </html>
+              </html>
